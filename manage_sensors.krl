@@ -22,7 +22,8 @@ ruleset manage_sensors {
       ent:sensors.map(
         function(v,k){
           eci = v{"eci"}
-          wrangler:picoQuery(eci,"temperature_store","temperatures",{})
+          ready = v{"ready"}
+          eci && ready => wrangler:picoQuery(eci,"temperature_store","temperatures",{}) | []
         })
     }
   }
