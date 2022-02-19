@@ -8,15 +8,15 @@ ruleset temperature_store {
 
   global {
     temperatures = function() {
-      ent:temperatures
+      ent:temperatures.defaultsTo([])
     };
     threshold_violations = function() {
-      ent:threshold_violations
+      ent:threshold_violations.defaultsTo([])
     };
     inrange_temperatures = function() {
-      ent:temperatures.filter(
+      ent:temperatures.defaultsTo([]).filter(
         function(temp) {
-          ent:threshold_violations.none(
+          ent:threshold_violations.defaultsTo([]).none(
             function(violation) {
               temp{"temp"} == violation{"temp"}
             })

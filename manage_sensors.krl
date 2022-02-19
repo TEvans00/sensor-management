@@ -12,7 +12,7 @@ ruleset manage_sensors {
 
   global {
     default_notification_number = "+13033324277"
-    default_threshold = 74
+    default_threshold = 78
 
     sensors = function() {
       ent:sensors
@@ -21,8 +21,9 @@ ruleset manage_sensors {
     temperatures = function() {
       ent:sensors.map(
         function(v,k){
-          eci = v{"eci"}
-          ready = v{"ready"}
+          name = k.klog("name:")
+          eci = v{"eci"}.klog("eci:")
+          ready = v{"ready"}.klog("ready")
           eci && ready => wrangler:picoQuery(eci,"temperature_store","temperatures",{}) | []
         })
     }
@@ -58,7 +59,7 @@ ruleset manage_sensors {
       eci = event:attrs{"eci"}.klog("eci:")
       name = event:attrs{"name"}.klog("name:")
     }
-    if true then noop()
+    if name then noop()
     fired {
       ent:sensors{name} := {"eci": eci, "ready": false}
     }
@@ -117,7 +118,8 @@ ruleset manage_sensors {
       name = (sensor.keys()[0]).klog("name:")
       sensor_eci = event:attrs{"sensor_eci"}.klog("sensor eci:")
     }
-    always {
+    if name then noop()
+    fired {
       ent:sensors{name} := {"eci": eci, "sensor_eci": sensor_eci, "ready": true}
     }
   }
