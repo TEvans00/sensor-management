@@ -25,6 +25,9 @@ ruleset sensor_installer {
           "session_id": meta:rulesetConfig{"session_id"}
         }
       },
+      "io.picolabs.wovyn.emitter": {
+        "config": {}
+      }
     }
 
     install_request = defaction(rid){

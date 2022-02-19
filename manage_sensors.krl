@@ -5,8 +5,9 @@ ruleset manage_sensors {
       Manages a collection of temperature sensors
     >>
     author "Tyla Evans"
-    provides sensors
-    shares sensors
+    provides sensors, temperatures
+    shares sensors, temperatures
+    use module io.picolabs.wrangler alias wrangler
   }
 
   global {
@@ -15,6 +16,14 @@ ruleset manage_sensors {
 
     sensors = function() {
       ent:sensors
+    }
+
+    temperatures = function() {
+      ent:sensors.map(
+        function(v,k){
+          eci = v{"eci"}
+          wrangler:picoQuery(eci,"temperature_store","temperatures",{})
+        })
     }
   }
 
