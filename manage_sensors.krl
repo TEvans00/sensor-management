@@ -5,11 +5,17 @@ ruleset manage_sensors {
       Manages a collection of temperature sensors
     >>
     author "Tyla Evans"
+    provides sensors
+    shares sensors
   }
 
   global {
     default_notification_number = "+13033324277"
     default_threshold = 74
+
+    sensors = function() {
+      ent:sensors
+    }
   }
 
   rule intialization {
@@ -103,6 +109,22 @@ ruleset manage_sensors {
     }
     always {
       ent:sensors{name} := {"eci": eci, "sensor_eci": sensor_eci, "ready": true}
+    }
+  }
+
+  rule delete_sensor {
+    select when sensor unneeded_sensor
+    pre {
+      name = event:attrs{"name"}.klog("name:")
+      exists = (ent:sensors >< name).klog("exists:")
+      eci = ent:sensors{name}{"eci"}.klog("eci:")
+    }
+    if exists && eci then
+      send_directive("deleting_sensor", {"sensor_name":name})
+    fired {
+      raise wrangler event "child_deletion_request"
+        attributes {"eci": eci};
+      clear ent:sensors{name}
     }
   }
 }
